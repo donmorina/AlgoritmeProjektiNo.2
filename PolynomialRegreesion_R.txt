@@ -1,0 +1,32 @@
+startTime <- Sys.time()
+BostonHousing <- read.csv("C:/Users/Bob/BostonHousing.csv")
+fit2=lm(medv~lstat+age,data=BostonHousing)
+endTime <- Sys.time()
+print(endTime-startTime)
+
+# Importing required library
+library(tidyverse)
+library(caret)
+theme_set(theme_classic())
+startTime <- Sys.time()
+# Load the data
+data("Boston", package = "MASS")
+# Split the data into training and test set
+set.seed(123)
+training.samples <- Boston$medv %>%
+    createDataPartition(p = 0.7, list = FALSE)
+train.data  <- Boston[training.samples, ]
+test.data <- Boston[-training.samples, ]
+
+# Build the model
+model <- lm(medv ~ poly(lstat, 5, raw = TRUE), data = train.data)
+# Make predictions
+predictions <- model %>% predict(test.data)
+endTime <- Sys.time()
+print((endTime-startTime)*1000)
+# Model performance
+data.frame(RMSE = RMSE(predictions, test.data$medv),
+           R2 = R2(predictions, test.data$medv))
+
+ggplot(train.data, aes(lstat, medv) ) + geom_point() +
+    stat_smooth(method = lm, formula = y ~ poly(x, 2, raw = TRUE))
